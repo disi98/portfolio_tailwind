@@ -1,0 +1,27 @@
+#!/bin/bash
+mkdir local-cdn
+mkdir local-cdn/static
+
+mkdir src/static
+mkdir src/static/css
+mkdir src/static/js
+mkdir src/static/img
+
+mkdir src/static/css/tw_input
+mkdir src/static/css/tw_output
+
+touch src/static/css/tw_input/tw_input.css
+
+echo "@tailwind base;
+@tailwind components;
+@tailwind utilities;" > src/static/css/tw_output/tw_output.css
+
+echo "STATIC_URL = "static/"
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static"
+    ]
+STATIC_ROOT = BASE_DIR.parent / "local-cdn" / "static"
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://localhost:8000']" >> src/src/settings.py
+
