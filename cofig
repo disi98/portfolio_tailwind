@@ -1,27 +1,93 @@
 #!/bin/bash
-mkdir local-cdn
-mkdir local-cdn/static
 
-mkdir src/static
-mkdir src/static/css
-mkdir src/static/js
-mkdir src/static/img
+echo "--------- Installing packadges Django + TailwindCSS + Flowbite ----------"
 
-mkdir src/static/css/tw_input
-mkdir src/static/css/tw_output
+# Check if virtualenv is installed, and install it if necessary
+if ! command -v virtualenv &> /dev/null; then
+    echo "virtualenv is not installed. Installing it now..."
+    pip install virtualenv
+fi
+
+# Create a virtual environment
+echo "Creating a virtual environment..."
+virtualenv venv
+
+# Activate the virtual environment
+echo "Activating the virtual environment..."
+source venv/bin/activate
+
+# Install the required packages
+echo "Installing required packages..."
+pip install \
+    django==5.1.1 \
+    djangorestframework \
+    markdown \
+    django-filter \
+    django-crispy-forms \
+    matplotlib \
+    plotly
+
+echo "All packages have been successfully installed."
+
+
+echo "Setup complete. To activate your virtual environment, use: source venv/bin/activate"
+
+echo "--------- Installing TailwindCSS + Flowbite ----------"
+npm install -D tailwindcss && npx tailwindcss init && npm install flowbite
+
+
+echo "---------- All packages installed ----------"
+echo "--------- Creating Django project ----------"
+django-admin startproject src
+echo " --------- Django project complete ----------"
+echo "--------- Tailwind install and config ----------"
+mkdir local-cdn local-cdn/static src/static src/static/css src/static/js src/static/img src/static/css/tw_input src/static/css/tw_output
 
 touch src/static/css/tw_input/tw_input.css
 
-echo "@tailwind base;
+echo "
+@tailwind base;
 @tailwind components;
-@tailwind utilities;" > src/static/css/tw_output/tw_output.css
+@tailwind utilities;" > src/static/css/tw_input/tw_input.css
 
-echo "STATIC_URL = "static/"
-
+echo "
 STATICFILES_DIRS = [
     BASE_DIR / "static"
     ]
 STATIC_ROOT = BASE_DIR.parent / "local-cdn" / "static"
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 CSRF_TRUSTED_ORIGINS = ['https://localhost:8000']" >> src/src/settings.py
+
+echo "
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './src/**/*.{html, js}',
+    './node_modules/flowbite/**/*.js'
+  ],
+  theme: {
+    screens: {
+      sm: '640px',
+      md: '768px',
+      lg: '976px',
+      xl: '1440px',
+    },
+    extend: {
+      colors: {
+        brightRed: 'hsl(12, 88%, 59%)',
+        brightRedLight: 'hsl(12, 88%, 69%)',
+        brightRedSupLight: 'hsl(12, 88%, 95%)',
+        darkBlue: 'hsl(228, 39%, 23%)',
+        darkGrayishBlue: 'hsl(227, 12%, 61%)',
+        veryDarkBlue: 'hsl(233, 12%, 13%)',
+        veryPaleRed: 'hsl(13, 100%, 96%)',
+        veryLightGray: 'hsl(0, 0%, 98%)',
+      },
+    },
+  },
+  plugins: [
+    require('flowbite/plugin'),
+  ],
+};" > tailwind.config.js
+
+echo "--------- Tailwind config complete ----------"
 
